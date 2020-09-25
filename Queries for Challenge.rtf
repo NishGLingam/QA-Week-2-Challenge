@@ -1,0 +1,88 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fnil\fcharset0 Menlo-Bold;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17600\viewh21880\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 * Write queries for the following: \
+    1. The most popular product sold on a specific date.\
+	
+\f1\fs22 \cf2 \CocoaLigature0 select productname from product where productid in (select productid from sales where dateofsale=curdate() group by pr\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+oductid having count(*) = (select max(popularity)  from (select productid, count(*) as popularity from sales where dateofsale\
+=curdate() group by productid) as poptable));
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0     2. The most popular product sold last week. \
+	
+\f1\fs22 \cf2 \CocoaLigature0 select productname from product where productid in (select productid from sales where week(dateofsale)=week(curdate())-1 group by productid having count(*) = (select max(popularity)  from (select productid, count(*) as popularity from sales where week(dateofsale)=week(curdate())-1 group by productid) as poptable));
+\f0\fs24 \cf0 \CocoaLigature1 \
+\
+    3. The most popular product sold on a specific month.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 select productname from product where productid in (select productid from sales where month(dateofsale)=8 group by productid having count(*) = (select max(popularity)  from (select productid, count(*) as popularity from sales where month(dateofsale)=8 group by productid) as poptable));
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+## Stretch Goals\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0     4. The most popular subcategory for a specific date.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 create view subcatpopdate as select product.subcategoryid, sum(productpop.productpop) as subcatpop from (select productid, count(*) as productpop from sales where dateofsale=
+\f2\b '2020-09-17'
+\f1\b0  group by productid) as productpop, product where product.productid = productpop.productid group by subcategoryid;\
+select subcategoryname from subcategory where subcategoryid in (select subcategoryid from subcatpop where subcatpop = (select max(subcatpop) from subcatpop));\
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0     5. The most popular subcategory for last week.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 create view subcatpoplastweek as select product.subcategoryid, sum(productpop.productpop) as subcatpop from (select productid, count(*) as productpop from sales where week(dateofsale)=week(curdate())-1 group by productid) as productpop, product where product.productid = productpop.productid group by subcategoryid;
+\f0\fs24 \cf0 \CocoaLigature1 \
+
+\f1\fs22 \cf2 \CocoaLigature0 select subcategoryname from subcategory where subcategoryid in (select subcategoryid from subcatpoplastweek where subcatpop = (select max(subcatpop) from subcatpoplastweek));\
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0     6. The most popular subcategory for a specific month.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 create view subcatpopmonth7 as select product.subcategoryid, sum(productpop.productpop) as subcatpop from (select productid, count(*) as productpop from sales where month(dateofsale)=
+\f2\b 7
+\f1\b0   group by productid) as productpop, product where product.productid = productpop.productid group by subcategoryid;\
+select subcategoryname from subcategory where subcategoryid in (select subcategoryid from subcatpopmonth7 where subcatpop = (select max(subcatpop) from subcatpopmonth7));
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+    7. The most popular category for a specific date.
+\f1\fs22 \cf2 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+create view catpop as select subcategory.categoryid, count(subcatpopdate.subcategoryid) as catpop from subcatpopdate, subcategory where subcatpopdate.subcategoryid=subcategory.subcategoryid group by categoryid;\
+select categoryname from category where categoryID in (select categoryID from catpop where catpop=(select max(catpop) from catpop));
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0     8. The most popular category for last week.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 create view catpoplastweek as select subcategory.categoryid, count(subcatpoplastweek.subcategoryid) as catpop from subcatpoplastweek, subcategory where subcatpoplastweek.subcategoryid=subcategory.subcategoryid group by categoryid;
+\f0\fs24 \cf0 \CocoaLigature1 \
+
+\f1\fs22 \cf2 \CocoaLigature0 select categoryname from category where categoryID in (select categoryID from catpoplastweek where catpop=(select max(catpop) from catpop));\
+
+\f0\fs24 \cf0 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0     9. The most popular category for a specific month.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \CocoaLigature0 create view catpopmonth7 as select subcategory.categoryid, count(subcatpopmonth7.subcategoryid) as catpop from subcatpopmonth7, subcategory where subcatpopmonth7.subcategoryid=subcategory.subcategoryid group by categoryid;\
+select categoryname from category where categoryID in (select categoryID from catpopmonth7 where catpop=(select max(ca\
+tpop) from catpop));}
